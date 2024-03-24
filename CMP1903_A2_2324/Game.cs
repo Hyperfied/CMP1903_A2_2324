@@ -46,6 +46,7 @@ namespace CMP1903_A2_2324
 
         public override void Play()
         {
+            statistics.numOfPlays++;
             Console.WriteLine("Welcome to Sevens Out!");
 
             // Get whether they are playing singleplayer or multiplayer
@@ -163,11 +164,6 @@ namespace CMP1903_A2_2324
             Console.WriteLine($"""{((bool)singlePlayer ? "The bot" : "Player 2")} got a score of {p2score}""");
             Console.ReadLine();
 
-
-
-
-
-
             if (p1score > p2score)
             {
                 Console.WriteLine("Player 1 wins!");
@@ -179,6 +175,15 @@ namespace CMP1903_A2_2324
             else
             {
                 Console.WriteLine("It's a draw!");
+            }
+
+            if (p1score > statistics.highestScore)
+            {
+                statistics.highestScore = p1score;
+            }
+            if (p2score > statistics.highestScore)
+            {
+                statistics.highestScore = p2score;
             }
         }
     }
