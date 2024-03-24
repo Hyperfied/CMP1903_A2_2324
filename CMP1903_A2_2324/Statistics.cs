@@ -8,5 +8,7 @@ namespace CMP1903_A2_2324
 {
     internal class Statistics
     {
+        public int numOfPlays;
+        public int highestScore;
     }
 }
