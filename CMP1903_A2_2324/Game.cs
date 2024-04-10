@@ -35,24 +35,13 @@ namespace CMP1903_A2_2324
                 }
             }
         }
-    }
 
-    internal class SevensOut : Game
-    {
-        public SevensOut() : base()
+        protected static bool SelectPlayerType()
         {
-            dice = [new Die(), new Die()];
-        }
-
-        public override void Play()
-        {
-            statistics.numOfPlays++;
-            Console.WriteLine("Welcome to Sevens Out!");
-
             // Get whether they are playing singleplayer or multiplayer
             bool? singlePlayer = null;
             Console.WriteLine("Are you playing with a friend, or by yourself? (Y/N)");
-            while(singlePlayer is null)
+            while (singlePlayer is null)
             {
                 string choice = Console.ReadLine().ToLower();
                 switch (choice)
@@ -69,6 +58,23 @@ namespace CMP1903_A2_2324
 
                 }
             }
+            return (bool)singlePlayer;
+        }
+    }
+
+    internal class SevensOut : Game
+    {
+        public SevensOut() : base()
+        {
+            dice = [new Die(), new Die()];
+        }
+
+        public override void Play()
+        {
+            statistics.numOfPlays++;
+            Console.WriteLine("Welcome to Sevens Out!");
+
+            bool singlePlayer = SelectPlayerType();
 
             int p1score = 0, p2score = 0;
             bool p1alive = true, p2alive = true;
@@ -192,12 +198,65 @@ namespace CMP1903_A2_2324
     {
         public ThreeOrMore() : base()
         {
-            dice = [new Die(), new Die(), new Die(), new Die(), new Die()];
+            
         }
 
         public override void Play()
         {
-            
+            statistics.numOfPlays++;
+            Console.WriteLine("Welcome to Three or More!");
+
+            bool singlePlayer = SelectPlayerType();
+
+            int p1score = 0, p2score = 0;
+
+            dice = [new Die(), new Die(), new Die(), new Die(), new Die()];
+            RollDice();
+            int[] counts = [0,0,0,0,0,0];
+            Console.Write($"You rolled: ");
+            foreach (var die in dice)
+            {
+                Console.Write($"{die.currentValue} ");
+                counts[die.currentValue - 1]++;
+            }
+
+            IEnumerable<int> fiveOfKind = from count in counts where count == 5 select count;
+            IEnumerable<int> fourOfKind = from count in counts where count == 4 select count;
+            IEnumerable<int> threeOfKind = from count in counts where count == 3 select count;
+            IEnumerable<int> twoOfKind = from count in counts where count == 2 select count;
+            if (fiveOfKind.Any()) { p1score += 12; }
+            if (fourOfKind.Any()) { p1score += 6; }
+            if (threeOfKind.Any()) { p1score += 3; }
+            if (twoOfKind.Any()) 
+            {
+                // Choose Reroll
+                Console.WriteLine();
+                Console.WriteLine("You rolled a Two of a Kind!");
+                Console.WriteLine("Do you want to reroll all the dice, or the remaining dice? (Y/N)");
+                bool? rerollAll = null;
+                while (rerollAll is null)
+                {
+                    string choice = Console.ReadLine().ToLower();
+                    switch (choice)
+                    {
+                        case "y":
+                            rerollAll = true;
+                            break;
+                        case "n":
+                            rerollAll = false;
+                            break;
+                        default:
+                            Console.WriteLine("Invalid choice.");
+                            break;
+                    }
+                }
+                if (rerollAll)
+                {
+
+                }
+
+            }
+
         }
     }
 }
