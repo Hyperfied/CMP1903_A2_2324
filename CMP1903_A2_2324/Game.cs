@@ -212,12 +212,17 @@ namespace CMP1903_A2_2324
 
             dice = [new Die(), new Die(), new Die(), new Die(), new Die()];
             RollDice();
+            int[] values = new int[5];
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = dice[i].currentValue;
+            }
             int[] counts = [0,0,0,0,0,0];
             Console.Write($"You rolled: ");
-            foreach (var die in dice)
+            foreach (var value in values)
             {
-                Console.Write($"{die.currentValue} ");
-                counts[die.currentValue - 1]++;
+                Console.Write($"{value} ");
+                counts[value - 1]++;
             }
 
             IEnumerable<int> fiveOfKind = from count in counts where count == 5 select count;
@@ -250,9 +255,16 @@ namespace CMP1903_A2_2324
                             break;
                     }
                 }
-                if (rerollAll)
+                if ((bool)rerollAll)
                 {
-
+                    RollDice();
+                }
+                else
+                {
+                    int number = Array.IndexOf(counts, 2) + 1;
+                    dice = [new Die(), new Die(), new Die()];
+                    RollDice();
+                    
                 }
 
             }
