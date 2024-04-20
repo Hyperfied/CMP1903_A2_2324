@@ -109,7 +109,7 @@ namespace CMP1903_A2_2324
                 }
                 if(p2alive)
                 {
-                    if ((bool)singlePlayer)
+                    if (singlePlayer)
                     {
                         Console.WriteLine("Bot, it's your turn!");
                         Console.ReadLine();
@@ -167,7 +167,7 @@ namespace CMP1903_A2_2324
             Console.ReadLine();
             Console.Write($"Player 1 got a score of {p1score}");
             Console.ReadLine();
-            Console.WriteLine($"""{((bool)singlePlayer ? "The bot" : "Player 2")} got a score of {p2score}""");
+            Console.WriteLine($"""{(singlePlayer ? "The bot" : "Player 2")} got a score of {p2score}""");
             Console.ReadLine();
 
             if (p1score > p2score)
@@ -176,7 +176,7 @@ namespace CMP1903_A2_2324
             }
             else if (p2score > p1score)
             {
-                Console.WriteLine($"""{((bool)singlePlayer ? "The bot" : "Player 2")} wins!""");
+                Console.WriteLine($"""{(singlePlayer ? "The bot" : "Player 2")} wins!""");
             }
             else
             {
@@ -208,65 +208,50 @@ namespace CMP1903_A2_2324
 
             bool singlePlayer = SelectPlayerType();
 
-            int p1score = 0, p2score = 0;
+            // Initialise variables
+            int p1Score = 0, p2score = 0;
 
-            dice = [new Die(), new Die(), new Die(), new Die(), new Die()];
-            RollDice();
-            int[] values = new int[5];
-            for (int i = 0; i < values.Length; i++)
+            while (p1Score < 20 && p2score < 20)
             {
-                values[i] = dice[i].currentValue;
-            }
-            int[] counts = [0,0,0,0,0,0];
-            Console.Write($"You rolled: ");
-            foreach (var value in values)
-            {
-                Console.Write($"{value} ");
-                counts[value - 1]++;
-            }
+                // Player 1 Turn
+                Console.WriteLine("Player 1, it's your turn!");
 
-            IEnumerable<int> fiveOfKind = from count in counts where count == 5 select count;
-            IEnumerable<int> fourOfKind = from count in counts where count == 4 select count;
-            IEnumerable<int> threeOfKind = from count in counts where count == 3 select count;
-            IEnumerable<int> twoOfKind = from count in counts where count == 2 select count;
-            if (fiveOfKind.Any()) { p1score += 12; }
-            if (fourOfKind.Any()) { p1score += 6; }
-            if (threeOfKind.Any()) { p1score += 3; }
-            if (twoOfKind.Any()) 
-            {
-                // Choose Reroll
-                Console.WriteLine();
-                Console.WriteLine("You rolled a Two of a Kind!");
-                Console.WriteLine("Do you want to reroll all the dice, or the remaining dice? (Y/N)");
-                bool? rerollAll = null;
-                while (rerollAll is null)
+                dice = [new Die(), new Die(), new Die(), new Die(), new Die()];
+                RollDice();
+                Console.ReadLine();
+
+                Console.Write($"You rolled: ");
+                foreach ( Die d in dice )
                 {
-                    string choice = Console.ReadLine().ToLower();
-                    switch (choice)
-                    {
-                        case "y":
-                            rerollAll = true;
-                            break;
-                        case "n":
-                            rerollAll = false;
-                            break;
-                        default:
-                            Console.WriteLine("Invalid choice.");
-                            break;
-                    }
+                    Console.Write($"{d.currentValue} ");
                 }
-                if ((bool)rerollAll)
+                Console.ReadLine();
+                var groups = dice.GroupBy(n => n.currentValue).Where(g => g.Count() >= 2).OrderByDescending(g => g.Count());
+                var highest = groups.FirstOrDefault();
+                if(highest != null)
                 {
-                    RollDice();
+                    Console.WriteLine($"You got a {highest.Count()}-of-a-kind!");
                 }
                 else
                 {
-                    int number = Array.IndexOf(counts, 2) + 1;
-                    dice = [new Die(), new Die(), new Die()];
-                    RollDice();
-                    
+                    Console.WriteLine("You didn't get any matches... :(");
                 }
 
+
+                // P2/Bot turn
+                Console.WriteLine(singlePlayer ? "It's the bot's turn!" : "Player 2, it's your turn!");
+
+                dice = [new Die(), new Die(), new Die(), new Die(), new Die()];
+                RollDice();
+                Console.ReadLine();
+
+                if (singlePlayer)
+                {
+
+                }
+                else
+                {
+                }
             }
 
         }
