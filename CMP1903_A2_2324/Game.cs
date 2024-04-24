@@ -9,7 +9,6 @@ namespace CMP1903_A2_2324
 {
     internal class Game
     {
-        public Statistics statistics;
         protected Die[]? dice;
         protected Testing tests;
         protected Random random;
@@ -19,13 +18,95 @@ namespace CMP1903_A2_2324
 
         public Game()
         {
-            statistics = new Statistics();
             tests = new Testing();
             random = new Random();
         }
 
         public virtual void Play()
         {
+            bool gameLoop = true;
+            while (gameLoop)
+            {
+                Console.Clear();
+                Console.WriteLine("Choose an option:");
+                Console.WriteLine("1. Play Sevens Out.");
+                Console.WriteLine("2. Play Three or More.");
+                Console.WriteLine("3. View stats.");
+                Console.WriteLine("4. Perform tests.");
+                Console.WriteLine("5. Exit");
+
+                string? input = Console.ReadLine();
+                switch (input) 
+                {
+                    case "1":
+                        Console.Clear();
+                        Game sevensOut = new SevensOut();
+                        sevensOut.Play();
+                        break;
+                    case "2":
+                        Console.Clear();
+                        Game threeOrMore = new ThreeOrMore();
+                        threeOrMore.Play();
+                        break;
+                    case "3":
+                        bool statsLoop = true;
+                        while (statsLoop)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Choose an option:");
+                            Console.WriteLine("1. View Sevens Out Statistics.");
+                            Console.WriteLine("2. View Three or More Statistics.");
+                            Console.WriteLine("3. Clear Sevens Out Statistics.");
+                            Console.WriteLine("4. Clear Three or More Statistics.");
+                            Console.WriteLine("5. Exit Statistics.");
+
+                            string? statInput = Console.ReadLine();
+                            switch (statInput)
+                            {
+                                case "1":
+                                    Console.Clear();
+                                    Statistics.sevensOut.DisplayStats();
+                                    break;
+                                case "2":
+                                    Console.Clear();
+                                    Statistics.threeOrMore.DisplayStats();
+                                    break;
+                                case "3":
+                                    Console.Clear();
+                                    Statistics.sevensOut = new SevensOutStat();
+                                    Console.WriteLine("Cleared Sevens Out Statistics.");
+                                    Console.ReadLine();
+                                    break;
+                                case "4":
+                                    Console.Clear();
+                                    Statistics.threeOrMore = new ThreeOrMoreStat();
+                                    Console.WriteLine("Cleared Three or More Statistics.");
+                                    Console.ReadLine();
+                                    break;
+                                case "5":
+                                    Console.WriteLine("Exiting Statistics...");
+                                    Console.ReadLine();
+                                    statsLoop = false;
+                                    break;
+                                default:
+                                    Console.WriteLine("Invalid input, make sure to input a number from 1-5.");
+                                    Console.ReadLine();
+                                    break;
+                            }
+                        }
+                        break;
+                    case "4":
+                        break;
+                    case "5":
+                        gameLoop = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid input, make sure to input a number from 1-5.");
+                        Console.ReadLine();
+                        break;
+                }
+            }
+            
 
         }
 
@@ -75,7 +156,7 @@ namespace CMP1903_A2_2324
 
         public override void Play()
         {
-            statistics.numOfPlays++;
+            Statistics.sevensOut.numberOfPlays++;
             Console.WriteLine("Welcome to Sevens Out!");
 
             singlePlayer = SelectPlayerType();
@@ -84,7 +165,9 @@ namespace CMP1903_A2_2324
             p2Score = 0;
             bool p1Alive = true, p2Alive = true;
 
-            while(p1Alive || p2Alive)
+            // Start game
+            Console.WriteLine("-----------------------");
+            while (p1Alive || p2Alive)
             {
                 if(p1Alive)
                 {
@@ -111,8 +194,10 @@ namespace CMP1903_A2_2324
                             p1Score += sum;
                         }
                     }
+                    Console.ReadLine();
+                    Console.WriteLine("-----------------------");
                 }
-                if(p2Alive)
+                if (p2Alive)
                 {
                     if (singlePlayer)
                     {
@@ -166,6 +251,8 @@ namespace CMP1903_A2_2324
                             }
                         }
                     }
+                    Console.ReadLine();
+                    Console.WriteLine("-----------------------");
                 }
             }
             Console.WriteLine("Both players rolled a 7, so the game is over!");
@@ -178,24 +265,30 @@ namespace CMP1903_A2_2324
             if (p1Score > p2Score)
             {
                 Console.WriteLine("Player 1 wins!");
+                Statistics.sevensOut.player1Wins++;
             }
             else if (p2Score > p1Score)
             {
                 Console.WriteLine($"""{(singlePlayer ? "The bot" : "Player 2")} wins!""");
+                Statistics.sevensOut.player2Wins++;
             }
             else
             {
                 Console.WriteLine("It's a draw!");
+                Statistics.sevensOut.draws++;
             }
 
-            if (p1Score > statistics.highestScore)
+            if (p1Score > Statistics.sevensOut.player1Highest)
             {
-                statistics.highestScore = p1Score;
+                Statistics.sevensOut.player1Highest = p1Score;
             }
-            if (p2Score > statistics.highestScore)
+            if (p2Score > Statistics.sevensOut.player2Highest)
             {
-                statistics.highestScore = p2Score;
+                Statistics.sevensOut.player2Highest = p2Score;
             }
+
+            Console.WriteLine("Returning to menu...");
+            Console.ReadLine();
         }
     }
 
@@ -208,10 +301,12 @@ namespace CMP1903_A2_2324
 
         private void FindOfKind(List<int> values, bool player1, bool firstCheck = true)
         {
+
             string pronoun = (singlePlayer && !player1 ? "They" : "You");
             // Groups any 2 or more of a kind together. (Dice Number, Count)
             var groups = values.GroupBy(n => n).Where(g => g.Count() >= 2).OrderByDescending(g => g.Count());
             var highest = groups.FirstOrDefault();
+            List<int> newValues;
 
             // Checks if there is a 2 or more of a kind
             if (highest != null)
@@ -231,7 +326,7 @@ namespace CMP1903_A2_2324
                                 RollDice();
                                 Console.ReadLine();
 
-                                List<int> newValues = new() { highest.Key, highest.Key };
+                                newValues = new() { highest.Key, highest.Key };
 
                                 // Write new dice numbers
                                 Console.Write("They rolled: ");
@@ -261,7 +356,7 @@ namespace CMP1903_A2_2324
                                         RollDice();
                                         Console.ReadLine();
 
-                                        List<int> newValues = new() { highest.Key, highest.Key };
+                                        newValues = new() { highest.Key, highest.Key };
 
                                         // Write new dice numbers
                                         Console.Write("You rolled: ");
@@ -277,6 +372,22 @@ namespace CMP1903_A2_2324
                                         break;
                                     case "n":
                                         Console.WriteLine("Rerolling all.");
+
+                                        RollDice();
+                                        Console.ReadLine();
+
+                                        newValues = new();
+
+                                        // Write new dice numbers
+                                        Console.Write("You rolled: ");
+                                        foreach (Die d in dice)
+                                        {
+                                            Console.Write($"{d.currentValue} ");
+                                            newValues.Add(d.currentValue);
+                                        }
+                                        Console.ReadLine();
+                                        FindOfKind(newValues, player1, false);
+
                                         invalidInput = false;
                                         break;
                                     default:
@@ -285,7 +396,7 @@ namespace CMP1903_A2_2324
                                 }
                             }
                         }
-                        
+                        Statistics.threeOrMore.twoOfAKinds++;
                         break;
                     case 3:
                         if (player1)
@@ -298,6 +409,7 @@ namespace CMP1903_A2_2324
                             p2Score += 3;
                             Console.WriteLine($"{pronoun} gain 3 points! (Total: {p2Score})");
                         }
+                        Statistics.threeOrMore.threeOfAKinds++;
                         break;
                     case 4:
                         if (player1)
@@ -310,6 +422,7 @@ namespace CMP1903_A2_2324
                             p2Score += 6;
                             Console.WriteLine($"{pronoun} gain 6 points!! (Total: {p2Score})");
                         }
+                        Statistics.threeOrMore.fourOfAKinds++;
                         break;
                     case 5:
                         if (player1)
@@ -322,18 +435,20 @@ namespace CMP1903_A2_2324
                             p2Score += 12;
                             Console.WriteLine($"{pronoun} gain 12 points!!! (Total: {p2Score})");
                         }
+                        Statistics.threeOrMore.fiveOfAKinds++;
                         break;
                 }
             }
             else
             {
                 Console.WriteLine($"{pronoun} didn't get any matches... :(");
+                Statistics.threeOrMore.noMatches++;
             }
         }
 
         public override void Play()
         {
-            statistics.numOfPlays++;
+            Statistics.threeOrMore.numberOfPlays++;
             Console.WriteLine("Welcome to Three or More!");
 
             singlePlayer = SelectPlayerType();
@@ -403,7 +518,26 @@ namespace CMP1903_A2_2324
                 // End P2/Bot turn
                 Console.WriteLine("-----------------------");
             }
+            Console.ReadLine();
+            if (p1Score >= 20)
+            {
+                Console.WriteLine($"Player 1 won with a score of {p1Score}!");
+                Console.Read();
+                Console.WriteLine($"{(singlePlayer ? "The bot" : "Player 2")} lost with a score of {p2Score}");
+                Console.Read();
+                Statistics.threeOrMore.player1Wins++;
+            }
+            else
+            {
+                Console.WriteLine($"{(singlePlayer ? "The bot" : "Player 2")} won with a score of {p2Score}!");
+                Console.Read();
+                Console.WriteLine($"Player 1 lost with a score of {p1Score}.");
+                Console.Read();
+                Statistics.threeOrMore.player2Wins++;
+            }
 
+            Console.WriteLine("Returning to menu...");
+            Console.ReadLine();
         }
     }
 }
