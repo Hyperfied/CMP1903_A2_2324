@@ -20,6 +20,7 @@ namespace CMP1903_A2_2324
             random = new Random();
         }
 
+
         public virtual void Play()
         {
             bool gameLoop = true;
@@ -40,11 +41,13 @@ namespace CMP1903_A2_2324
                         Console.Clear();
                         Game sevensOut = new SevensOut();
                         sevensOut.Play();
+                        Statistics.SaveData();
                         break;
                     case "2":
                         Console.Clear();
                         Game threeOrMore = new ThreeOrMore();
                         threeOrMore.Play();
+                        Statistics.SaveData();
                         break;
                     case "3":
                         bool statsLoop = true;
@@ -91,6 +94,7 @@ namespace CMP1903_A2_2324
                                     Console.ReadLine();
                                     break;
                             }
+                            Statistics.SaveData();
                         }
                         break;
                     case "4":

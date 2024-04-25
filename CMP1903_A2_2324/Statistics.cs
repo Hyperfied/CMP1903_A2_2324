@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CMP1903_A2_2324
@@ -10,6 +11,47 @@ namespace CMP1903_A2_2324
     {
         public static ThreeOrMoreStat threeOrMore = new();
         public static SevensOutStat sevensOut = new();
+
+        public static void SaveData()
+        {
+            string threeOrMoreSerialised = JsonSerializer.Serialize(threeOrMore);
+            string sevensOutSerialised = JsonSerializer.Serialize(sevensOut);
+
+            using (StreamWriter sw = new StreamWriter("ThreeOrMoreStats.json"))
+            {
+                sw.WriteLine(threeOrMoreSerialised);
+            }
+            using (StreamWriter sw = new StreamWriter("SevensOutStats.json"))
+            {
+                sw.WriteLine(sevensOutSerialised);
+            }
+        }
+        public static void LoadData()
+        {
+            string threeOrMoreSerialised;
+            string sevensOutSerialised;
+            try 
+            {
+                using (StreamReader sr = new StreamReader("ThreeOrMoreStats.json"))
+                {
+                    threeOrMoreSerialised = sr.ReadToEnd();
+                }
+                using (StreamReader sr = new StreamReader("SevensOutStats.json"))
+                {
+                    sevensOutSerialised = sr.ReadToEnd();
+                }
+
+                ThreeOrMoreStat threeOrMoreStat = JsonSerializer.Deserialize<ThreeOrMoreStat>(threeOrMoreSerialised);
+                SevensOutStat sevensOutStat = JsonSerializer.Deserialize<SevensOutStat>(sevensOutSerialised);
+                threeOrMore = threeOrMoreStat;
+                sevensOut = sevensOutStat;
+            } catch (FileNotFoundException e)
+            {
+                sevensOut = new();
+                threeOrMore = new();
+            }
+            
+        }
     }
 
     internal interface IGameStat
