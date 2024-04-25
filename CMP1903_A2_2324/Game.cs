@@ -9,16 +9,14 @@ namespace CMP1903_A2_2324
 {
     internal class Game
     {
-        protected Die[]? dice;
-        protected Testing tests;
+        public Die[]? dice;
         protected Random random;
-        protected int p1Score;
-        protected int p2Score;
+        public int p1Score;
+        public int p2Score;
         protected bool singlePlayer;
 
         public Game()
         {
-            tests = new Testing();
             random = new Random();
         }
 
@@ -96,6 +94,10 @@ namespace CMP1903_A2_2324
                         }
                         break;
                     case "4":
+                        Testing testing = new();
+                        testing.RunTests();
+                        Console.WriteLine("Tests performed.");
+                        Console.ReadLine();
                         break;
                     case "5":
                         gameLoop = false;
@@ -110,7 +112,7 @@ namespace CMP1903_A2_2324
 
         }
 
-        protected void RollDice()
+        public void RollDice()
         {
             if (dice != null)
             {
@@ -154,6 +156,16 @@ namespace CMP1903_A2_2324
             dice = [new Die(), new Die()];
         }
 
+        public int GetDiceSum()
+        {
+            return dice[0].currentValue + dice[1].currentValue;
+        }
+
+        public bool ContinuePlaying()
+        {
+            return GetDiceSum() != 7;
+        }
+
         public override void Play()
         {
             Statistics.sevensOut.numberOfPlays++;
@@ -175,14 +187,14 @@ namespace CMP1903_A2_2324
                     Console.ReadLine();
                     RollDice();
                     Console.WriteLine($"You rolled: {dice[0].currentValue}, {dice[1].currentValue}");
-                    if (dice[0].currentValue + dice[1].currentValue == 7)
+                    if (ContinuePlaying())
                     {
                         Console.WriteLine("You rolled a seven, so you stop playing!");
                         p1Alive = false;
                     }
                     else
                     {
-                        int sum = dice[0].currentValue + dice[1].currentValue;
+                        int sum = GetDiceSum();
                         if (dice[0].currentValue == dice[1].currentValue)
                         {
                             Console.WriteLine($"You rolled a double! You get {sum * 2} score!");
@@ -205,14 +217,14 @@ namespace CMP1903_A2_2324
                         Console.ReadLine();
                         RollDice();
                         Console.WriteLine($"The bot rolled: {dice[0].currentValue}, {dice[1].currentValue}");
-                        if (dice[0].currentValue + dice[1].currentValue == 7)
+                        if (ContinuePlaying())
                         {
                             Console.WriteLine("They rolled a seven, so they stop playing!");
                             p2Alive = false;
                         }
                         else
                         {
-                            int sum = dice[0].currentValue + dice[1].currentValue;
+                            int sum = GetDiceSum();
                             if (dice[0].currentValue == dice[1].currentValue)
                             {
                                 Console.WriteLine($"They rolled a double! they get {sum * 2} score!");
@@ -231,14 +243,14 @@ namespace CMP1903_A2_2324
                         Console.ReadLine();
                         RollDice();
                         Console.WriteLine($"You rolled: {dice[0].currentValue}, {dice[1].currentValue}");
-                        if (dice[0].currentValue + dice[1].currentValue == 7)
+                        if (ContinuePlaying()) 
                         {
                             Console.WriteLine("You rolled a seven, so you stop playing!");
                             p2Alive = false;
                         }
                         else
                         {
-                            int sum = dice[0].currentValue + dice[1].currentValue;
+                            int sum = GetDiceSum();
                             if (dice[0].currentValue == dice[1].currentValue)
                             {
                                 Console.WriteLine($"You rolled a double! You get {sum * 2} score!");
@@ -297,6 +309,32 @@ namespace CMP1903_A2_2324
         public ThreeOrMore() : base()
         {
             
+        }
+
+        public bool IsGameOver()
+        {
+            return p1Score >= 20 || p2Score >= 20;
+        }
+
+        public int AddScore(bool player1, int numberOfAKind)
+        {
+            switch (numberOfAKind)
+            {
+                case 3:
+                    if (player1) p1Score += 3;
+                    else p2Score += 3;
+                    return 3;
+                case 4:
+                    if (player1) p1Score += 6;
+                    else p2Score += 6;
+                    return 6;
+                case 5:
+                    if (player1) p1Score += 12;
+                    else p2Score += 12;
+                    return 12;
+                default:
+                    return 0;
+            }
         }
 
         private void FindOfKind(List<int> values, bool player1, bool firstCheck = true)
@@ -398,44 +436,22 @@ namespace CMP1903_A2_2324
                         }
                         Statistics.threeOrMore.twoOfAKinds++;
                         break;
-                    case 3:
-                        if (player1)
+                    default:
+                        int score = AddScore(player1, highest.Count());
+                        Console.WriteLine($"{pronoun} gain {score} points!!! (Total: {(player1 ? p1Score : p2Score)})");
+                        switch (score)
                         {
-                            p1Score += 3;
-                            Console.WriteLine($"{pronoun} gain 3 points! (Total: {p1Score})");
+                            case 3:
+                                Statistics.threeOrMore.threeOfAKinds++;
+                                break;
+                            case 6:
+                                Statistics.threeOrMore.fourOfAKinds++;
+                                break;
+                            case 12:
+                                Statistics.threeOrMore.fiveOfAKinds++;
+                                break;
                         }
-                        else
-                        {
-                            p2Score += 3;
-                            Console.WriteLine($"{pronoun} gain 3 points! (Total: {p2Score})");
-                        }
-                        Statistics.threeOrMore.threeOfAKinds++;
-                        break;
-                    case 4:
-                        if (player1)
-                        {
-                            p1Score += 6;
-                            Console.WriteLine($"{pronoun} gain 6 points!! (Total: {p1Score})");
-                        }
-                        else
-                        {
-                            p2Score += 6;
-                            Console.WriteLine($"{pronoun} gain 6 points!! (Total: {p2Score})");
-                        }
-                        Statistics.threeOrMore.fourOfAKinds++;
-                        break;
-                    case 5:
-                        if (player1)
-                        {
-                            p1Score += 12;
-                            Console.WriteLine($"{pronoun} gain 12 points!!! (Total: {p1Score})");
-                        }
-                        else
-                        {
-                            p2Score += 12;
-                            Console.WriteLine($"{pronoun} gain 12 points!!! (Total: {p2Score})");
-                        }
-                        Statistics.threeOrMore.fiveOfAKinds++;
+
                         break;
                 }
             }
